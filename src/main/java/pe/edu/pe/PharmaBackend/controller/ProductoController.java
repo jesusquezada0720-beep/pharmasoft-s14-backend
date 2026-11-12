@@ -18,6 +18,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/v1/productos")
 public class ProductoController {
+    private static final int TAMANIO_MAXIMO_PAGINA = 100;
     private static final Set<String> CAMPOS_ORDENABLES = Set.of("id", "nombre", "precio", "stock");
     private final ProductoService productoService;
 
@@ -34,6 +35,9 @@ public class ProductoController {
 
         if (pagina < 0 || tamanio < 1) {
             throw new ReglaNegocioException("La página debe ser mayor o igual a 0 y el tamaño mayor a 0.");
+        }
+        if (tamanio > TAMANIO_MAXIMO_PAGINA) {
+            throw new ReglaNegocioException("El tamaño máximo permitido por página es " + TAMANIO_MAXIMO_PAGINA + ".");
         }
         if (!CAMPOS_ORDENABLES.contains(ordenarPor)) {
             throw new ReglaNegocioException("Campo de orden inválido. Use: id, nombre, precio o stock.");

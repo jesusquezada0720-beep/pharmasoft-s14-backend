@@ -2,10 +2,14 @@ package pe.edu.pe.PharmaBackend.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.pe.PharmaBackend.dto.ClienteRequestDTO;
 import pe.edu.pe.PharmaBackend.dto.ClienteResponseDTO;
+import pe.edu.pe.PharmaBackend.dto.PaginaResponseDTO;
 import pe.edu.pe.PharmaBackend.entity.Cliente;
 import pe.edu.pe.PharmaBackend.exception.RecursoNoEncontradoException;
 import pe.edu.pe.PharmaBackend.exception.ReglaNegocioException;
@@ -113,6 +117,25 @@ public class ClienteServiceImpl
                 .stream()
                 .map(this::convertirResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PaginaResponseDTO<ClienteResponseDTO> listar(
+            int pagina,
+            int tamanio,
+            String ordenarPor,
+            String direccion) {
+        Sort.Direction sentido = Sort.Direction.fromString(direccion);
+        Page<Cliente> resultado = clienteRepository.findAll(
+                PageRequest.of(pagina, tamanio, Sort.by(sentido, ordenarPor)));
+        return new PaginaResponseDTO<>(
+                resultado.getContent().stream().map(this::convertirResponse).toList(),
+                resultado.getNumber(),
+                resultado.getSize(),
+                resultado.getTotalElements(),
+                resultado.getTotalPages(),
+                resultado.isLast());
     }
 
     @Override
