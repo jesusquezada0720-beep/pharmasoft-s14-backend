@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/ventas")
 public class VentaController {
+    private static final int TAMANIO_MAXIMO_PAGINA = 100;
     private static final String CAMPO_ORDENABLE = "fecha";
 
     private final VentaService ventaService;
@@ -57,6 +58,9 @@ public class VentaController {
 
         if (pagina < 0 || tamanio < 1) {
             throw new ReglaNegocioException("La página debe ser mayor o igual a 0 y el tamaño mayor a 0.");
+        }
+        if (tamanio > TAMANIO_MAXIMO_PAGINA) {
+            throw new ReglaNegocioException("El tamaño máximo permitido por página es " + TAMANIO_MAXIMO_PAGINA + ".");
         }
         if (desde != null && hasta != null && desde.isAfter(hasta)) {
             throw new ReglaNegocioException("La fecha desde no puede ser posterior a la fecha hasta.");
